@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+	<style type="text/css">
+		.row {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-6 {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+.card {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+.card-body {
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.25rem;
+}
+.form-control {
+    display: block;
+    /*width: 100%;*/
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.btn-primary {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+
+
+ul {
+display: flex;
+/* establish flex container */
+flex-wrap: wrap;
+/* enable flex items to wrap */
+padding: 0;
+/* remove default padding */
+list-style-type: none;
+        }
+ 
+li {
+flex: 0 0 100%;
+/* don't grow, don't shrink, fixed width of 50% */
+        }
+
+        li *{
+        	padding: 20px;
+        }
+
+	</style>
+</head>
+<body>
+	<div class="row">
+	<div class="col-6">
+		<div class="card">
+			<div class="card-body">
+				<span>Email Address</span>
+				<input id="emailAddress" class=form-control type="email" name=""><br>
+				<span id="emailAddressError"></span><br>
+				<input onclick="addEmailAddress()" class="btn btn-primary" type="button" name="" value="Add">
+			</div>
+		</div>
+	</div>
+	<div class="col-6">
+		<div class="card">
+			<div class="card-body">
+				<input id="searchEmailAddressTxt" onkeyup="searchEmailAddress()" class="form-control" type="search" name="">
+				<input id="showEmailAddres" onclick="showCheckEmailAddress()" type="checkbox" name=""> Show only Enabled <br>
+
+				<ul id="listEmailAddress">
+				<li>
+					<span><b>IsEnabled</b></span>
+					<span><b>Email</b></span>
+					<span><b>Delete</b></span>
+				</li>														
+				</ul>
+			</div>
+		</div>
+	</div>
+	</div>
+	<script type="text/javascript">
+
+		function validateEmail(elementValue){      
+			var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+			return emailPattern.test(elementValue); 
+		} 
+		var listEmailAddressData = [];
+		function addEmailAddress() {
+			var emailAddress = document.getElementById("emailAddress");
+			if(!validateEmail(emailAddress.value)){				
+				var emailAddressError = document.getElementById("emailAddressError");
+				emailAddressError.innerText = "Invalid Email Address";				
+				return false;
+			}
+			listEmailAddressData.push({				
+				enabled:false,
+				emailid:emailAddress.value,
+				deletefun:function () {
+					console.log(this);
+				}
+			});
+			loadEmailAddress();
+		}
+
+		function loadEmailAddress(data) {
+			var data =  data ||  listEmailAddressData;
+			var showEmailAddres = document.getElementById("showEmailAddres");
+
+			var ul = document.getElementById("listEmailAddress");			
+			var genHtml = "<li><span><b>IsEnabled</b></span><span><b>Email</b></span><span><b>Delete</b></span></li>";
+			for (var i = 0; i < data.length; i++) {	
+				var checked = data[i].enabled?'checked':'';		
+				genHtml+='<li data-index='+i+'> <input type="checkbox" '+ checked +' onclick="updateEmailAddressCheck(this)" name=""> <span>'+data[i].emailid+'</span> <input class="btn" type="button" name="" onclick="deleteEmailAddress(this)" value="Delete"> </li>';
+			}		
+			ul.innerHTML= genHtml;	
+		}
+		function deleteEmailAddress(obj) {
+			var temp = [];
+			for (var i = 0; i < listEmailAddressData.length; i++) {
+				if(i==obj.parentElement.getAttribute("data-index")) continue;
+				temp.push(listEmailAddressData[i]);
+			}
+			listEmailAddressData=temp;
+			loadEmailAddress();
+		}
+
+		function updateEmailAddressCheck(obj) {
+			listEmailAddressData[obj.parentElement.getAttribute("data-index")].enabled=obj.checked;
+			loadEmailAddress();
+		}
+
+		function searchEmailAddress() {
+			var searchEmailAddressTxt = document.getElementById("searchEmailAddressTxt");			
+			var temp = []
+
+			for (var i = 0; i < listEmailAddressData.length; i++) {
+				if(listEmailAddressData[i].emailid.indexOf(searchEmailAddressTxt.value)!=-1){
+					temp.push(listEmailAddressData[i]);
+				}
+			}			
+			loadEmailAddress(temp);
+		}
+
+		function showCheckEmailAddress() {
+			var temp = []
+			for (var i = 0; i < listEmailAddressData.length; i++) {
+				if(!showEmailAddres.checked || (showEmailAddres.checked && listEmailAddressData[i].enabled)){
+					temp.push(listEmailAddressData[i]);
+				}
+			}				
+			loadEmailAddress(temp);
+		}
+
+	</script>
+</body>
+</html>
